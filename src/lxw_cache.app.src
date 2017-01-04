@@ -1,0 +1,18 @@
+%%在启动应用或在执行运行时代码热升级时，OTP需要了解一些用于描述应用自身的元数据
+{application, lxw_cache,
+    [
+        {description, "A simple caching system"},
+        {vsn, "1.0.0"},
+        {modules, [
+                    lc_app,
+                    lc_sup
+                ]},
+        {registered, [lc_sup]},
+        {applications,[kernel, stdlib]},
+        {mod, {lc_app, []}},
+        %% application 启动时候的参数配置, 通过：application:get_env(ParamKey)获取， application:get_env(ch_app, file)
+        {env, [
+            
+        ]}
+    ]
+}.

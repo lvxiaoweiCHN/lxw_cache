@@ -1,0 +1,24 @@
+test_cache:9 report [230,181,139,232,175,149,49]
+test_cache:12 report [230,181,139,232,175,149,50]
+test_cache:9 report [230,181,139,232,175,149,49]
+test_cache:12 report [230,181,139,232,175,149,50]
+test_cache:9 report [230,181,139,232,175,149,49]
+test_cache:12 report [230,181,139,232,175,149,50]
+test_cache:9 report [230,181,139,232,175,149,49]
+test_cache:12 report [230,181,139,232,175,149,50]
+error [test_cache,9,230,181,139,232,175,149,49]
+test_cache:12 report [230,181,139,232,175,149,50]
+error [test_cache,9,230,181,139,232,175,149,49]
+test_cache:12 report [230,181,139,232,175,149,50]
+error [test_cache,9,230,181,139,232,175,149,49]
+test_cache:12 report [230,181,139,232,175,149,50]
+error [test_cache,9,230,181,139,232,175,149,49]
+test_cache:12 report [230,181,139,232,175,149,50]
+lc_store:19 insert sss,dd
+lc_store:19 insert sss,dd
+lc_store:13 lookup sss
+lc_store:25 delete sss
+lc_store:25 delete sss
+lc_store:25 delete sss
+lc_store:13 lookup sss
+lc_store:19 insert sss,dd
