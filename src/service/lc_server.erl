@@ -4,25 +4,23 @@
 
 -export([start_link/0, insert/2, lookup/1, delete/1]).
 -export([init/1, handle_call/3, handle_cast/2, handle_info/2, terminate/2, code_change/3]).
+-define (SERVER, ?MODULE).
 
 %%子进程状态
 -record(state, {overtime, update_callback}).
 
 %% 启动gen_server进程
 start_link() ->
-    gen_server:start_link(?MODULE, [], []).
+    gen_server:start_link({local, ?SERVER}, ?MODULE, [], []).
 
 insert(Key, Value) ->
-    io:format("insert cast ~p,~p~n", [Key, Value]),
-    gen_server:cast(?MODULE, {insert, Key, Value}).
+    gen_server:cast(?SERVER, {insert, Key, Value}).
 
 lookup(Key) ->
-    io:format("lookup call ~p~n~n", [Key]),
-    gen_server:call(?MODULE, {lookup, Key}).
+    gen_server:call(?SERVER, {lookup, Key}).
 
 delete(Key) ->
-    io:format("delete cast ~p~n~n", [Key]),
-    gen_server:cast(?MODULE, {delete, Key}).
+    gen_server:cast(?SERVER, {delete, Key}).
 
 % --------------------------------------------------------------------
 % Function: init/1
@@ -48,17 +46,23 @@ init([]) ->
 %          {stop, Reason, State}            (terminate/2 is called)
 % --------------------------------------------------------------------
 handle_call({lookup, Key}, _From, State) ->
-    #state{overtime = Overtime, update_callback = {Module, Fun}} = State,
-    io:format("lookup handle_call ~p~n", [Key]),
-    {Value, Old_time} = lc_store:lookup(Key),
-    case time_utils:verify_overtime(Old_time, Overtime) of
-        nolimit ->
-            {reply, {ok, Value}, State};
-        overtime ->
-            {NewKey, NewValue} = apply(Module, Fun, Key),
-            spawn(?MODULE, update, [{NewKey, NewValue}]),
+    #state{overtime = Overtime, update_callback = {Mod, Fun}} = State,
+    case lc_store:lookup(Key) of
+        {ok, Value, Old_time} ->
+            case time_utils:verify_overtime(Old_time, Overtime) of
+                nolimit ->
+                    {reply, {ok, Value}, State};
+                overtime ->
+                    {NewKey, NewValue} = apply(Mod, Fun, [Key]),
+                    spawn(?SERVER, insert, [NewKey, NewValue]),
+                    {reply, {ok, NewValue}, State}
+            end;
+        _ ->
+            {NewKey, NewValue} = apply(Mod, Fun, [Key]),
+            spawn(?SERVER, insert, [NewKey, NewValue]),
             {reply, {ok, NewValue}, State}
     end;
+
 handle_call(_, _From, State) ->
     {noreply, State}.
 
@@ -70,15 +74,12 @@ handle_call(_, _From, State) ->
 %          {stop, Reason, State}            (terminate/2 is called)
 % --------------------------------------------------------------------
 handle_cast({insert, Key, Value}, State) ->
-    io:format("insert handle_cast ~p,~p~n", [Key, Value]),
-    lc_store:insert(Key, Value),
+    lc_store:insert({Key, Value}),
     {noreply, State};
 handle_cast({delete, Key}, State) ->
-    io:format("insert handle_cast ~p~n", [Key]),
     lc_store:delete(Key),
     {noreply, State};
-handle_cast(Request, State) ->
-    io:format("Request handle_cast ~p~n", [Request]),
+handle_cast(_Request, State) ->
     {noreply, State}.
 % --------------------------------------------------------------------
 % Function: handle_info/2
