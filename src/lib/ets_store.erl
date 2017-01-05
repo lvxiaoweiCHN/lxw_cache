@@ -31,4 +31,8 @@ delete(Key) ->
 
 delete_cache(OutTime)->
     TimeTemp = time_utils:get_current_seconds() - OutTime,
-    ets:fun2ms(fun({_Value, Current_time}) when Current_time < TimeTemp -> ets:match_delete(?TABLE_ID,{'_',Current_time}) end ).
+    lists:foldl(fun(_Num,{Key, {_Value, Current_time}}) when
+                     Current_time < TimeTemp ->
+                        ets:delete(?TABLE_ID,Key)
+                end,
+        0,ets:tab2list(?TABLE_ID)).
