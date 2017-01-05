@@ -38,8 +38,8 @@ handle_call(_Request, _From, State) ->
 handle_cast(_Request, State) ->
   {noreply, State}.
 
-handle_info(timeout, State = #state{check_time=CheckTime, out_time=OutTime,callback = CallBack}) ->
-	Call= list_to_atom(CallBack+"_out_time_delete"),
+handle_info(timeout, #state{check_time=CheckTime, out_time=OutTime,callback = CallBack} = State) ->
+	Call= list_to_atom(atom_to_list(CallBack) ++ "_out_time_delete"),
 	clean_util:Call(OutTime),
 	{noreply, State,CheckTime};
 
