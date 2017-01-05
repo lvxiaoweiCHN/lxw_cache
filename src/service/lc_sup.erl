@@ -16,7 +16,8 @@ init(_Args) ->
     %% permanent型，子进程在间隔指定的时间后重启
     ElementSup = {lc_server, {lc_server, start_link, []}, permanent, 2000, worker, [lc_server]},
     EventManager = {lc_event, {lc_event, start_link, []}, permanent, 2000, worker, [lc_event]},
-    Children = [ElementSup, EventManager],
+    CacheClean = {lc_clean, {lc_clean, start_link, []}, permanent, 2000, worker, [lc_clean]},
+    Children = [ElementSup, EventManager,CacheClean],
     %% 重启策略，one_for_one监督策略，可以同时监督多个不同类型的子进程
     RestartStrategy = {one_for_one, 4, 3600},
     {ok, {RestartStrategy, Children}}.
