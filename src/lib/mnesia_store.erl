@@ -1,6 +1,6 @@
 -module (mnesia_store).
 
--export([init/0, insert/2, delete/1, lookup/1]).
+-export([init/0, insert/2, delete/1, lookup/1,delete_cache/1]).
 
 -define(TABLE_ID, ?MODULE).
 -record(key_to_value, {key, value, time}).
@@ -30,3 +30,10 @@ delete(Key) ->
         _ ->
             ok
     end.
+delete_cache(OutTime)->
+    TimeTemp = time_utils:get_current_seconds() - OutTime,
+    MatchHead= #key_to_value{key = '$1', _ = '_', time = '$2'},
+    Guard={'<', '$2', TimeTemp},
+    Result='$1',
+    Keys=mnesia:select(?TABLE_ID,[{MatchHead, [Guard], [Result]}]),
+    lists:foldl(fun(_, key) -> mnesia:delete(key) end, 0,Keys).

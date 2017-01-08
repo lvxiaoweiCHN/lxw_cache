@@ -1,11 +1,14 @@
 .eunit
+.idea
 deps
 *.o
 *.beam
 *.plt
 erl_crash.dump
 ebin
+*.iml
 rel/example_project
 .concrete/DEV_MODE
 .rebar
 log/*
+out/
