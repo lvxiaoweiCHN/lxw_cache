@@ -25,6 +25,9 @@ delete(Key) ->
     ?report ("delete ~p~n", [Key]),
     apply(getImplementModule(), delete, [Key]).
 
+delete_cache(OutTime)->
+    ets_store:delete_cache(OutTime).
+
 getImplementModule() ->
     case config_utils:get(store_type) of
         {M, F} ->
