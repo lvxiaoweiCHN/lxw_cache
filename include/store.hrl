@@ -1,5 +1,5 @@
 -define(APP, lxw_cache).
--define(APP_PATH, "/mnt/work/lxw_cache/").
+-define(APP_PATH, "C:/Users/tagore/Desktop/Git Source/lxw_cache/").
 
 -define (config (Key), config_utils:get(Key)).
 -define (config (Key, Default), config_utils:get(Key, Default)).
